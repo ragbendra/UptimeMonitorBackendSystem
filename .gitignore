@@ -1,0 +1,12 @@
+uptime-monitor-backend-spec.md
+
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
