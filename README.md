@@ -49,3 +49,20 @@ All monitor endpoints require login.
 
 Deleting a monitor cascades deletion to its check jobs, incidents, and alert jobs.
 This keeps the beginner version simple and avoids orphaned records.
+
+## Scheduler
+
+Run the scheduler with:
+
+```bash
+python -m workers.scheduler
+```
+
+The scheduler:
+
+- uses a Redis lock so only one scheduler instance enqueues jobs at a time
+- finds active monitors that are due for checking
+- creates `check_jobs` rows for due monitors
+- uses an idempotency key so the same monitor is not scheduled twice in the same time window
+
+The scheduler only creates jobs. The check worker runs those jobs in the next module.
