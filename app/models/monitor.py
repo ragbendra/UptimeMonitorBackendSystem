@@ -17,7 +17,7 @@ class Monitor(Base):
     __tablename__ = "monitors"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     name: Mapped[str] = mapped_column(String(255))
     target_url: Mapped[str] = mapped_column(String(2048))
     method: Mapped[MonitorMethod] = mapped_column(
@@ -53,6 +53,13 @@ class Monitor(Base):
     )
 
     user: Mapped["User"] = relationship(back_populates="monitors")
-    check_jobs: Mapped[list["CheckJob"]] = relationship(back_populates="monitor")
-    incidents: Mapped[list["Incident"]] = relationship(back_populates="monitor")
-
+    check_jobs: Mapped[list["CheckJob"]] = relationship(
+        back_populates="monitor",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    incidents: Mapped[list["Incident"]] = relationship(
+        back_populates="monitor",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )

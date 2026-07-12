@@ -15,7 +15,7 @@ class CheckJob(Base):
     __tablename__ = "check_jobs"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    monitor_id: Mapped[int] = mapped_column(ForeignKey("monitors.id"), index=True)
+    monitor_id: Mapped[int] = mapped_column(ForeignKey("monitors.id", ondelete="CASCADE"), index=True)
     scheduled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     status: Mapped[JobStatus] = mapped_column(
         Enum(JobStatus, name="job_status"),

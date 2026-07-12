@@ -23,7 +23,7 @@ class Incident(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    monitor_id: Mapped[int] = mapped_column(ForeignKey("monitors.id"), index=True)
+    monitor_id: Mapped[int] = mapped_column(ForeignKey("monitors.id", ondelete="CASCADE"), index=True)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
@@ -32,5 +32,8 @@ class Incident(Base):
     )
 
     monitor: Mapped["Monitor"] = relationship(back_populates="incidents")
-    alert_jobs: Mapped[list["AlertJob"]] = relationship(back_populates="incident")
-
+    alert_jobs: Mapped[list["AlertJob"]] = relationship(
+        back_populates="incident",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )

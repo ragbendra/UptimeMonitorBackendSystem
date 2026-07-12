@@ -2,12 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from app.api.routers import auth
+from app.api.routers import auth, monitors
 from app.core.config import settings
 
 
 app = FastAPI(title=settings.app_name)
 app.include_router(auth.router)
+app.include_router(monitors.router)
 
 
 @app.exception_handler(RequestValidationError)

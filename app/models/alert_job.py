@@ -15,7 +15,7 @@ class AlertJob(Base):
     __tablename__ = "alert_jobs"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    incident_id: Mapped[int] = mapped_column(ForeignKey("incidents.id"), index=True)
+    incident_id: Mapped[int] = mapped_column(ForeignKey("incidents.id", ondelete="CASCADE"), index=True)
     alert_type: Mapped[AlertType] = mapped_column(Enum(AlertType, name="alert_type"))
     status: Mapped[JobStatus] = mapped_column(
         Enum(JobStatus, name="job_status"),
@@ -40,4 +40,3 @@ class AlertJob(Base):
     )
 
     incident: Mapped["Incident"] = relationship(back_populates="alert_jobs")
-
