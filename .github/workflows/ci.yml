@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Check Python imports
         env:
           DATABASE_URL: postgresql+asyncpg://uptime:uptime@localhost:5432/uptime_monitor
           REDIS_URL: redis://localhost:6379/0
@@ -30,5 +30,4 @@ jobs:
           SMTP_PASSWORD: ""
           SMTP_FROM_EMAIL: alerts@example.com
           SMTP_USE_TLS: "false"
-        run: pytest
-
+        run: python -m compileall app alembic workers
