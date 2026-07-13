@@ -2,17 +2,19 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import get_current_user
 from app.db import get_db_session
-from app.models import Monitor, User
+from app.models import Incident, Monitor, User
 from app.models.enums import MonitorMethod
 from app.schemas.monitor import (
     MonitorCreateRequest,
     MonitorResponse,
     MonitorUpdateRequest,
 )
+from app.schemas.incident import IncidentResponse
 
 
 router = APIRouter(prefix="/monitors", tags=["monitors"])
@@ -115,3 +117,20 @@ async def delete_monitor(
     await session.delete(monitor)
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/{monitor_id}/incidents", response_model=list[IncidentResponse])
+async def list_monitor_incidents(
+    monitor_id: int,
+    current_user: Annotated[User, Depends(get_current_user)],
+    session: Annotated[AsyncSession, Depends(get_db_session)],
+) -> list[Incident]:
+    await get_owned_monitor(monitor_id, current_user, session)
+
+    result = await session.execute(
+        select(Incident)
+        .options(selectinload(Incident.alert_jobs))
+        .where(Incident.monitor_id == monitor_id)
+        .order_by(Incident.started_at.desc(), Incident.id.desc())
+    )
+    return list(result.scalars().all())

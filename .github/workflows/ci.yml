@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  tests:
+  checks:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,3 +31,20 @@ jobs:
           SMTP_FROM_EMAIL: alerts@example.com
           SMTP_USE_TLS: "false"
         run: python -m compileall app alembic workers
+
+      - name: Check migration SQL
+        env:
+          DATABASE_URL: postgresql+asyncpg://uptime:uptime@localhost:5432/uptime_monitor
+          REDIS_URL: redis://localhost:6379/0
+          JWT_SECRET_KEY: test-secret
+          JWT_EXPIRE_MINUTES: "60"
+          SMTP_HOST: localhost
+          SMTP_PORT: "1025"
+          SMTP_USERNAME: ""
+          SMTP_PASSWORD: ""
+          SMTP_FROM_EMAIL: alerts@example.com
+          SMTP_USE_TLS: "false"
+        run: alembic upgrade head --sql
+
+      - name: Check Docker Compose config
+        run: docker compose config
